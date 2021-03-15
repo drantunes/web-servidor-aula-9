@@ -1,32 +1,18 @@
-<?php 
-// Funções
-require_once("Conexao.php");
+<?php
+    // Exemplo de rota: /jogos/listar
 
-$acao = $_GET["acao"] ?? "listar";
+    // Quebramos a rota em um array 
+    $rota = explode('/', substr($_SERVER['REQUEST_URI'], 1));
+    // $rota[0] é o recurso | $rota[1] é a ação
+    // Como não temos index, se o recurso for / então carregamos a página padrão "jogos" 
+    $recurso = empty($rota[0]) ? 'jogos' : $rota[0];
+    // Criarmos o controlador dinamicamente para o $recurso
+    $controlador = "controllers/$recurso.controller.php";
+    // Então, salvamos a ação. Caso não haja ação, o padrão é listar (index)
+    $acao = empty($rota[1]) ? "listar" : $rota[1];
 
-// Logica
-$bd = Conexao::get();
-
-if($acao == 'listar') {
-    
-    $query = $bd->prepare("SELECT * FROM jogos");
-    $query->execute();
-    $jogos = $query->fetchAll(PDO::FETCH_OBJ);
-
-} else if($acao == 'gravar') {
-    
-    $query = $bd->prepare("INSERT INTO jogos(titulo, plataforma) VALUES(:titulo, :plataforma)");
-    $query->bindParam(':titulo', $_POST['titulo']);
-    $query->bindParam(':plataforma', $_POST['plataforma']);
-    $query->execute();
-    header('Location: /');
-
-} else if($acao == 'remover') {
-    $query = $bd->prepare("DELETE FROM jogos WHERE id = :id");
-    $query->bindParam(':id', $_GET['id']);
-    $query->execute();
-    header('Location: /');
-}
-
-// UI
-require_once("views.php");
+    if (file_exists($controlador)) {
+        require($controlador);
+    } else {
+        require("controllers/404.controller.php");
+    }

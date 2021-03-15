@@ -1,9 +1,10 @@
 <?php 
-    require_once("views/header.php");
+    include('layout/header.php');
 
-    if(file_exists("views/${acao}.view.php"))
-        require_once("views/${acao}.view.php");
-    else
-        require_once("views/listar.view.php");
+    if(file_exists("views/${acao}.view.php")) :
+        include("views/${acao}.view.php");
+    else :
+        include("layout/404.php");
+    endif;
 
-    require_once("views/footer.php");
+    include("layout/footer.php");
